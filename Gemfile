@@ -54,3 +54,13 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 end
+
+group :test do
+  gem "rspec-rails", "~> 8.0.0"
+
+  # Generate (almost) realistic fake data for testing, demos, and populating your database during development.
+  gem "ffaker", require: false
+
+  # factory_bot is a fixtures replacement with a straightforward definition syntax
+  gem "factory_bot_rails", require: false
+end
