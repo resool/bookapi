@@ -44,6 +44,10 @@ gem "alba", "~> 4.0.0"
 # Catch unsafe migrations in development
 gem "strong_migrations", "~> 2.8.0"
 
+# Seamlessly adds a Swagger to Rails-based API's
+gem "rswag-api"
+gem "rswag-ui"
+
 group :development, :test do
   # Help to kill N+1 queries and unused eager loading
   gem "bullet"
@@ -56,6 +60,9 @@ group :development, :test do
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
+
+  # Seamlessly adds a Swagger to Rails-based API's
+  gem "rswag-specs"
 
   # Code smell detector for Ruby
   gem "reek", require: false
