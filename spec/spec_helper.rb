@@ -16,6 +16,7 @@
 
 require 'ffaker'
 require 'factory_bot_rails'
+require 'timecop'
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

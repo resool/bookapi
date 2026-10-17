@@ -67,6 +67,9 @@ group :test do
   # Generate (almost) realistic fake data for testing, demos, and populating your database during development.
   gem "ffaker", require: false
 
+  # A gem providing "time travel" and "time freezing" capabilities
+  gem "timecop", "~> 0.9.11", require: false
+
   # factory_bot is a fixtures replacement with a straightforward definition syntax
   gem "factory_bot_rails", require: false
 end
