@@ -41,6 +41,9 @@ gem "image_processing", "~> 1.2"
 # Alba is a JSON serializer for Ruby, JRuby, and TruffleRuby.
 gem "alba", "~> 4.0.0"
 
+# Catch unsafe migrations in development
+gem "strong_migrations", "~> 2.8.0"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
