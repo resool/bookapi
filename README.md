@@ -1,24 +1,15 @@
-# README
+## Data structure
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Schema: [`docs/schema.dbml`](docs/schema.dbml) ([dbdiagram view](https://dbdiagram.io/d/bookapi-6ad3b1ddfe5cc8bda2e5b124))
 
-Things you may want to cover:
+### Design decisions
 
-* Ruby version
+- **Surrogate primary keys instead of `items.sku` / `members.member_number`**
+  Business identifiers can change (relabeling, typos, new numbering scheme). They're enforced with unique indexes instead, so changing one doesn't cascade through foreign keys.
 
-* System dependencies
+- **`loans.rented_at` separate from `created_at`**
+  Business time vs. record time: the two diverge for imported historical loans, loans entered after the fact, or manual corrections.
 
-* Configuration
+### Out of scope
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- Normalizing publishers and translators (stored as strings on `editions`)

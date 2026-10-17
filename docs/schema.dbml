@@ -1,0 +1,97 @@
+Enum item_status {
+  available
+  lost
+  withdrawn
+  loaned
+  in_repair
+}
+
+Enum member_status {
+  pending
+  active
+  suspended
+  archived
+}
+
+Table authors {
+  id bigint [pk]
+  name string [not null]
+  description text
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table works {
+  id bigint [pk]
+  title string [not null]
+  description text
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table authorships {
+  id bigint [pk]
+  author_id bigint [not null, ref: > authors.id]
+  work_id bigint [not null, ref: > works.id]
+  indexes {
+    (work_id, author_id) [unique]
+    author_id
+  }
+}
+
+Table editions {
+  id bigint [pk]
+  work_id bigint [not null, ref: > works.id]
+  title string [not null]
+  description text
+  translator string
+  publisher string [not null]
+  published_year integer
+  isbn string [note: 'unique WHERE isbn IS NOT NULL']
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  indexes {
+    work_id
+    isbn [unique]
+  }
+}
+
+Table items {
+  id bigint [pk]
+  edition_id bigint [not null, ref: > editions.id]
+  sku string [not null, unique]
+  status item_status [not null, default: "available", note: 'available | in_repair | lost | withdrawn']
+  condition string [not null]
+  acquired_on date
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  indexes {
+    edition_id
+  }
+}
+
+Table members {
+  id bigint [pk]
+  member_number string [not null, unique]
+  name string [not null]
+  email string [not null, unique, note: 'unique on lower(email)']
+  status member_status [not null, default: "pending", note: 'active | suspended | closed']
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table loans {
+  id bigint [pk]
+  item_id bigint [not null, ref: > items.id]
+  member_id bigint [not null, ref: > members.id]
+  borrowed_at timestamp [not null]
+  due_at timestamp [not null]
+  returned_at timestamp
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+  indexes {
+    item_id [unique, note: 'WHERE returned_at IS NULL']
+    member_id
+    due_at [note: 'WHERE returned_at IS NULL — przetrzymania']
+  }
+}
