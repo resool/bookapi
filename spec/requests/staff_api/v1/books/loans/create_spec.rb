@@ -11,7 +11,7 @@ RSpec.describe "Staff API: borrow book", openapi_spec: "staff_api/v1/openapi.yam
         type: :object,
         required: %w[member_number],
         properties: {
-          member_number: { type: :string, example: "000042", description: "Library card number" }
+          member_number: { type: :string, pattern: "^\\d{6}$", example: "000042", description: "Library card number" }
         }
       }
 

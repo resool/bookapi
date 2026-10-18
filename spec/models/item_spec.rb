@@ -11,8 +11,13 @@ RSpec.describe Item do
 
   describe "validations" do
     it { is_expected.to validate_presence_of(:sku) }
-    it { is_expected.to validate_uniqueness_of(:sku).case_insensitive }
+    it { is_expected.to validate_uniqueness_of(:sku).ignoring_case_sensitivity }
     it { is_expected.to validate_presence_of(:condition) }
+
+    describe "sku format" do
+      it { is_expected.to allow_values("000123", "999999").for(:sku) }
+      it { is_expected.not_to allow_values("12345", "1234567", "12345a", "12 345", "-12345").for(:sku).with_message("must be 6 digits") }
+    end
   end
 
   describe "status" do

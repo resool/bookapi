@@ -11,7 +11,7 @@ RSpec.describe "Staff API: create book", openapi_spec: "staff_api/v1/openapi.yam
         type: :object,
         required: %w[sku condition],
         properties: {
-          sku: { type: :string, example: "000123" },
+          sku: { type: :string, pattern: "^\\d{6}$", example: "000123" },
           condition: { type: :string, example: "new" },
           acquired_on: { type: :string, format: :date }
         }
@@ -45,12 +45,21 @@ RSpec.describe "Staff API: create book", openapi_spec: "staff_api/v1/openapi.yam
         schema "$ref" => "#/components/schemas/errors_object"
         error_example :sku_taken, "validation_failed", "Sku has already been taken"
         error_example :condition_missing, "validation_failed", "Condition can't be blank"
+        error_example :sku_invalid_format, "validation_failed", "Sku must be 6 digits"
 
         context "when SKU is already taken" do
           before { create(:item, sku: "000123") }
 
           run_test! do |response|
             expect(error_codes(response)).to include("validation_failed")
+          end
+        end
+
+        context "when SKU has invalid format" do
+          let(:params) { { sku: "12345", condition: "new" } }
+
+          run_test! do |response|
+            expect(response.parsed_body["errors"].pluck("message")).to include("Sku must be 6 digits")
           end
         end
 

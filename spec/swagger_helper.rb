@@ -24,7 +24,7 @@ module OpenapiSchemas
   AUTHORS = { type: :array, items: { type: :string }, example: [ "Lucy Maud Montgomery" ] }.freeze
 
   STAFF_BOOK_PROPERTIES = {
-    sku: { type: :string, example: "000123" },
+    sku: { type: :string, pattern: "^\\d{6}$", example: "000123" },
     condition: { type: :string, example: "good" },
     status: { type: :string, enum: %w[available loaned in_repair lost withdrawn], example: "available" },
     title: { type: :string, example: "Anne of Green Gables" },
@@ -39,7 +39,7 @@ module OpenapiSchemas
       rented_at: { type: :string, format: "date-time", example: "2026-10-01T10:15:00Z" },
       due_at: { type: :string, format: "date-time", example: "2026-10-31T10:15:00Z" },
       returned_at: { type: :string, format: "date-time", nullable: true, example: nil },
-      member_number: { type: :string, example: "000042" }
+      member_number: { type: :string, pattern: "^\\d{6}$", example: "000042" }
     }
   }.freeze
 

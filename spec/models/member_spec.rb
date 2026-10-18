@@ -11,8 +11,13 @@ RSpec.describe Member do
     it { is_expected.to validate_presence_of(:member_number) }
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:email) }
-    it { is_expected.to validate_uniqueness_of(:member_number).case_insensitive }
+    it { is_expected.to validate_uniqueness_of(:member_number).ignoring_case_sensitivity }
     it { is_expected.to validate_uniqueness_of(:email).ignoring_case_sensitivity }
+
+    describe "member_number format" do
+      it { is_expected.to allow_values("000042", "999999").for(:member_number) }
+      it { is_expected.not_to allow_values("4242", "1234567", "00004x", "000 42").for(:member_number).with_message("must be 6 digits") }
+    end
   end
 
   describe "status" do
