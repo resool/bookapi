@@ -1,0 +1,49 @@
+---
+openapi: 3.0.1
+info:
+  title: Library Public API
+  version: v1
+paths:
+  "/public-api/v1/books":
+    get:
+      summary: List books with availability
+      tags:
+      - Books
+      responses:
+        '200':
+          description: books listed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/book"
+servers:
+- url: http://localhost:3000
+components:
+  schemas:
+    book:
+      type: object
+      required:
+      - available
+      - title
+      - description
+      - authors
+      additionalProperties: false
+      properties:
+        available:
+          type: boolean
+          example: true
+        title:
+          type: string
+          example: Anne of Green Gables
+        description:
+          type: string
+          example: An orphan girl is mistakenly sent to live with an elderly brother
+            and sister on Prince Edward Island.
+        authors:
+          type: array
+          items:
+            type: string
+          example:
+          - Lucy Maud Montgomery

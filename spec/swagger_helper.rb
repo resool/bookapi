@@ -1,43 +1,114 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
+
+module OpenapiSchemas
+  ERRORS_OBJECT = {
+    type: :object,
+    required: %w[errors],
+    properties: {
+      errors: {
+        type: :array,
+        items: {
+          type: :object,
+          required: %w[code message],
+          properties: {
+            code: { type: :string, example: "book_not_available" },
+            message: { type: :string, example: "Book 000123 is currently loaned" }
+          }
+        }
+      }
+    }
+  }.freeze
+
+  AUTHORS = { type: :array, items: { type: :string }, example: ["Lucy Maud Montgomery"] }.freeze
+
+  STAFF_BOOK_PROPERTIES = {
+    sku: { type: :string, example: "000123" },
+    condition: { type: :string, example: "good" },
+    status: { type: :string, enum: %w[available loaned in_repair lost withdrawn], example: "available" },
+    title: { type: :string, example: "Anne of Green Gables" },
+    description: { type: :string, example: "An orphan girl is mistakenly sent to live with an elderly brother and sister on Prince Edward Island." },
+    authors: AUTHORS
+  }.freeze
+
+  LOAN = {
+    type: :object,
+    required: %w[rented_at due_at returned_at member_number],
+    properties: {
+      rented_at: { type: :string, format: "date-time", example: "2026-10-01T10:15:00Z" },
+      due_at: { type: :string, format: "date-time", example: "2026-10-31T10:15:00Z" },
+      returned_at: { type: :string, format: "date-time", nullable: true, example: nil },
+      member_number: { type: :string, example: "000042" }
+    }
+  }.freeze
+end
+
+module OpenapiErrorExamples
+  def error_example(name, code, message)
+    example "application/json", name, { errors: [{ code:, message: }] }
+  end
+end
 
 RSpec.configure do |config|
-  # Specify a root folder where Swagger JSON files are generated
-  # NOTE: If you're using the rswag-api to serve API descriptions, you'll need
-  # to ensure that it's configured to serve Swagger from the same folder
-  config.openapi_root = Rails.root.join('swagger').to_s
+  config.extend OpenapiErrorExamples, type: :request
+  config.include(Module.new do
+    def error_codes(response)
+      response.parsed_body["errors"].pluck("code")
+    end
+  end, type: :request)
 
-  # Define one or more Swagger documents and provide global metadata for each one
-  # When you run the 'rswag:specs:swaggerize' rake task, the complete Swagger will
-  # be generated at the provided relative path under openapi_root
-  # By default, the operations defined in spec files are added to the first
-  # document below. You can override this behavior by adding a openapi_spec tag to the
-  # the root example_group in your specs, e.g. describe '...', openapi_spec: 'v2/swagger.json'
+  config.openapi_root = Rails.root.join("swagger").to_s
+
+  servers = [{ url: "http://localhost:3000" }]
+
   config.openapi_specs = {
-    'v1/swagger.yaml' => {
-      openapi: '3.0.1',
-      info: {
-        title: 'API V1',
-        version: 'v1'
-      },
+    "staff_api/v1/openapi.yaml" => {
+      openapi: "3.0.1",
+      info: { title: "Library Staff API", version: "v1" },
       paths: {},
-      servers: [
-        {
-          url: 'https://{defaultHost}',
-          variables: {
-            defaultHost: {
-              default: 'www.example.com'
+      servers:,
+      components: {
+        schemas: {
+          errors_object: OpenapiSchemas::ERRORS_OBJECT,
+          loan: OpenapiSchemas::LOAN,
+          book: {
+            type: :object,
+            required: OpenapiSchemas::STAFF_BOOK_PROPERTIES.keys.map(&:to_s),
+            properties: OpenapiSchemas::STAFF_BOOK_PROPERTIES
+          },
+          book_with_loans: {
+            type: :object,
+            required: OpenapiSchemas::STAFF_BOOK_PROPERTIES.keys.map(&:to_s) + %w[loans],
+            properties: OpenapiSchemas::STAFF_BOOK_PROPERTIES.merge(
+              loans: { type: :array, items: { "$ref" => "#/components/schemas/loan" } }
+            )
+          }
+        }
+      }
+    },
+    "public_api/v1/openapi.yaml" => {
+      openapi: "3.0.1",
+      info: { title: "Library Public API", version: "v1" },
+      paths: {},
+      servers:,
+      components: {
+        schemas: {
+          book: {
+            type: :object,
+            required: %w[available title description authors],
+            additionalProperties: false,
+            properties: {
+              available: { type: :boolean, example: true },
+              title: { type: :string, example: "Anne of Green Gables" },
+              description: { type: :string, example: "An orphan girl is mistakenly sent to live with an elderly brother and sister on Prince Edward Island." },
+              authors: OpenapiSchemas::AUTHORS
             }
           }
         }
-      ]
+      }
     }
   }
 
-  # Specify the format of the output Swagger file when running 'rswag:specs:swaggerize'.
-  # The openapi_specs configuration option has the filename including format in
-  # the key, this may want to be changed to avoid putting yaml in json files.
-  # Defaults to json. Accepts ':json' and ':yaml'.
   config.openapi_format = :yaml
 end

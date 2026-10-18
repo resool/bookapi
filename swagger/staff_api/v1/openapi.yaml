@@ -1,0 +1,417 @@
+---
+openapi: 3.0.1
+info:
+  title: Library Staff API
+  version: v1
+paths:
+  "/staff-api/v1/editions/{edition_id}/books":
+    post:
+      summary: Add a book copy to an edition
+      tags:
+      - Books
+      parameters:
+      - name: edition_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: book created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/book"
+        '404':
+          description: edition not found
+          content:
+            application/json:
+              examples:
+                edition_not_found:
+                  value:
+                    errors:
+                    - code: edition_not_found
+                      message: Edition with id 42 not found
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '422':
+          description: invalid params
+          content:
+            application/json:
+              examples:
+                sku_taken:
+                  value:
+                    errors:
+                    - code: validation_failed
+                      message: Sku has already been taken
+                condition_missing:
+                  value:
+                    errors:
+                    - code: validation_failed
+                      message: Condition can't be blank
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - sku
+              - condition
+              properties:
+                sku:
+                  type: string
+                  example: '000123'
+                condition:
+                  type: string
+                  example: new
+                acquired_on:
+                  type: string
+                  format: date
+  "/staff-api/v1/books/{sku}":
+    delete:
+      summary: Withdraw a book copy (soft delete)
+      tags:
+      - Books
+      parameters:
+      - name: sku
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: book withdrawn
+        '409':
+          description: book is currently loaned
+          content:
+            application/json:
+              examples:
+                book_loaned:
+                  value:
+                    errors:
+                    - code: book_loaned
+                      message: Book 000123 is currently loaned and cannot be withdrawn
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '404':
+          description: book not found
+          content:
+            application/json:
+              examples:
+                book_not_found:
+                  value:
+                    errors:
+                    - code: book_not_found
+                      message: Book with SKU 000123 not found
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+    get:
+      summary: Show a book with its full loan history
+      tags:
+      - Books
+      parameters:
+      - name: sku
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: book with loan history
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/book_with_loans"
+        '404':
+          description: book not found
+          content:
+            application/json:
+              examples:
+                book_not_found:
+                  value:
+                    errors:
+                    - code: book_not_found
+                      message: Book with SKU 000123 not found
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+  "/staff-api/v1/books":
+    get:
+      summary: List books with their status
+      tags:
+      - Books
+      responses:
+        '200':
+          description: books listed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/book"
+  "/staff-api/v1/books/{sku}/loans":
+    post:
+      summary: Borrow a book
+      tags:
+      - Loans
+      parameters:
+      - name: sku
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          description: book borrowed
+          content:
+            application/json:
+              examples:
+                borrowed:
+                  value:
+                    rented_at: '2026-10-01T10:15:00Z'
+                    due_at: '2026-10-15T10:15:00Z'
+                    returned_at:
+                    member_number: '000042'
+              schema:
+                "$ref": "#/components/schemas/loan"
+        '404':
+          description: book not found
+          content:
+            application/json:
+              examples:
+                book_not_found:
+                  value:
+                    errors:
+                    - code: book_not_found
+                      message: Book with SKU 000123 not found
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '409':
+          description: book not available
+          content:
+            application/json:
+              examples:
+                book_loaned:
+                  value:
+                    errors:
+                    - code: book_not_available
+                      message: Book 000123 is currently loaned
+                book_in_repair:
+                  value:
+                    errors:
+                    - code: book_not_available
+                      message: Book 000123 is in repair
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '422':
+          description: member cannot borrow
+          content:
+            application/json:
+              examples:
+                member_not_found:
+                  value:
+                    errors:
+                    - code: member_not_found
+                      message: Member with card number 000042 not found
+                member_suspended:
+                  value:
+                    errors:
+                    - code: member_suspended
+                      message: Member 000042 is suspended
+                member_has_overdue_loans:
+                  value:
+                    errors:
+                    - code: member_has_overdue_loans
+                      message: Member 000042 has overdue loans
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - member_number
+              properties:
+                member_number:
+                  type: string
+                  example: '000042'
+                  description: Library card number
+  "/staff-api/v1/books/{sku}/return":
+    post:
+      summary: Return a borrowed book
+      tags:
+      - Loans
+      parameters:
+      - name: sku
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: book returned
+          content:
+            application/json:
+              examples:
+                returned:
+                  value:
+                    rented_at: '2026-10-01T10:15:00Z'
+                    due_at: '2026-10-15T10:15:00Z'
+                    returned_at: '2026-10-12T16:40:00Z'
+                    member_number: '000042'
+              schema:
+                "$ref": "#/components/schemas/loan"
+        '409':
+          description: book is not loaned
+          content:
+            application/json:
+              examples:
+                book_not_loaned:
+                  value:
+                    errors:
+                    - code: book_not_loaned
+                      message: Book 000123 is not currently loaned
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '404':
+          description: book not found
+          content:
+            application/json:
+              examples:
+                book_not_found:
+                  value:
+                    errors:
+                    - code: book_not_found
+                      message: Book with SKU 000123 not found
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+servers:
+- url: http://localhost:3000
+components:
+  schemas:
+    errors_object:
+      type: object
+      required:
+      - errors
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+            - code
+            - message
+            properties:
+              code:
+                type: string
+                example: book_not_available
+              message:
+                type: string
+                example: Book 000123 is currently loaned
+    loan:
+      type: object
+      required:
+      - rented_at
+      - due_at
+      - returned_at
+      - member_number
+      properties:
+        rented_at:
+          type: string
+          format: date-time
+          example: '2026-10-01T10:15:00Z'
+        due_at:
+          type: string
+          format: date-time
+          example: '2026-10-15T10:15:00Z'
+        returned_at:
+          type: string
+          format: date-time
+          nullable: true
+          example:
+        member_number:
+          type: string
+          example: '000042'
+    book:
+      type: object
+      required:
+      - sku
+      - condition
+      - status
+      - title
+      - description
+      - authors
+      properties:
+        sku:
+          type: string
+          example: '000123'
+        condition:
+          type: string
+          example: good
+        status:
+          type: string
+          enum:
+          - available
+          - loaned
+          - in_repair
+          - lost
+          - withdrawn
+          example: available
+        title:
+          type: string
+          example: Anne of Green Gables
+        description:
+          type: string
+          example: An orphan girl is mistakenly sent to live with an elderly brother
+            and sister on Prince Edward Island.
+        authors:
+          type: array
+          items:
+            type: string
+          example:
+          - Lucy Maud Montgomery
+    book_with_loans:
+      type: object
+      required:
+      - sku
+      - condition
+      - status
+      - title
+      - description
+      - authors
+      - loans
+      properties:
+        sku:
+          type: string
+          example: '000123'
+        condition:
+          type: string
+          example: good
+        status:
+          type: string
+          enum:
+          - available
+          - loaned
+          - in_repair
+          - lost
+          - withdrawn
+          example: available
+        title:
+          type: string
+          example: Anne of Green Gables
+        description:
+          type: string
+          example: An orphan girl is mistakenly sent to live with an elderly brother
+            and sister on Prince Edward Island.
+        authors:
+          type: array
+          items:
+            type: string
+          example:
+          - Lucy Maud Montgomery
+        loans:
+          type: array
+          items:
+            "$ref": "#/components/schemas/loan"
