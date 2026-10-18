@@ -1,6 +1,7 @@
 class Edition < ApplicationRecord
   belongs_to :work
   has_many :items, dependent: :restrict_with_error
+  has_many :authors, through: :works
 
   normalizes :isbn, with: ->(isbn) { isbn.delete("- ").presence }
 
