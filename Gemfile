@@ -61,6 +61,9 @@ group :development, :test do
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
 
+  # Shoulda Matchers provides RSpec and Minitest-compatible one-liners to test common Rails functionality
+  gem "shoulda-matchers", "~> 8.0"
+
   # Seamlessly adds a Swagger to Rails-based API's
   gem "rswag-specs"
 
