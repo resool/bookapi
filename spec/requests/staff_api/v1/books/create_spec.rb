@@ -1,6 +1,6 @@
 require "swagger_helper"
 
-RSpec.describe "Staff API: create book", openapi_spec: "staff_api/v1/openapi.yaml", skip: "endpoint not implemented yet" do
+RSpec.describe "Staff API: create book", openapi_spec: "staff_api/v1/openapi.yaml" do
   path "/staff-api/v1/editions/{edition_id}/books" do
     post "Add a book copy to an edition" do
       tags "Books"

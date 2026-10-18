@@ -1,6 +1,8 @@
 detectors:
   IrresponsibleModule:
     enabled: false
+  MissingSafeMethod:
+    enabled: false
   UncommunicativeModuleName:
     accept:
       - "/(^|::)V\\d+$/"

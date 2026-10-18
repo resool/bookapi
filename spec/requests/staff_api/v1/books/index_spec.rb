@@ -1,6 +1,6 @@
 require "swagger_helper"
 
-RSpec.describe "Staff API: list books", openapi_spec: "staff_api/v1/openapi.yaml", skip: "endpoint not implemented yet" do
+RSpec.describe "Staff API: list books", openapi_spec: "staff_api/v1/openapi.yaml" do
   path "/staff-api/v1/books" do
     get "List books with their status" do
       tags "Books"

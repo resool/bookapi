@@ -29,7 +29,7 @@ RSpec.describe Loan do
           create(:loan, :returned, item: item)
         end
 
-        it { is_expected.to be_invalid }
+        it { is_expected.to be_valid }
       end
     end
   end

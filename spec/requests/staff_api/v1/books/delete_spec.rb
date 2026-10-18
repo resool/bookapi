@@ -1,6 +1,6 @@
 require "swagger_helper"
 
-RSpec.describe "Staff API: delete book", openapi_spec: "staff_api/v1/openapi.yaml", skip: "endpoint not implemented yet" do
+RSpec.describe "Staff API: delete book", openapi_spec: "staff_api/v1/openapi.yaml" do
   path "/staff-api/v1/books/{sku}" do
     delete "Withdraw a book copy (soft delete)" do
       tags "Books"
