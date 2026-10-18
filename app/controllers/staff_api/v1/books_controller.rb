@@ -3,16 +3,16 @@ module StaffApi
     class BooksController < BaseController
       # GET /staff-api/v1/books
       def index
-        items = Item.where.not(status: :withdrawn).includes(edition: { work: :authors })
+        items = Item.where.not(status: :withdrawn).includes(edition: { work: :authors }).order(:id)
 
-        render json: BookSerializer.new(items).serialize
+        render_paginated(items, serializer: BookSerializer)
       end
 
       # GET /staff-api/v1/books/:sku
       def show
         item = Item.includes(edition: { work: :authors }, loans: :member).find_by!(sku: params[:sku])
 
-        render json: BookSerializer.new(item, with_traits: :with_loans).serialize
+        render_data(BookSerializer.new(item, with_traits: :with_loans).serializable_hash)
       end
 
       # POST /staff-api/v1/editions/:edition_id/books
@@ -25,7 +25,7 @@ module StaffApi
           acquired_on: params[:acquired_on]
         ).call
 
-        render json: BookSerializer.new(item).serialize, status: :created
+        render_data(BookSerializer.new(item).serializable_hash, status: :created)
       end
 
       # DELETE /staff-api/v1/books/:sku

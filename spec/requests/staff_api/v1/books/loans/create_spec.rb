@@ -21,17 +21,19 @@ RSpec.describe "Staff API: borrow book", openapi_spec: "staff_api/v1/openapi.yam
       let(:params) { { member_number: member.member_number } }
 
       response "201", "book borrowed" do
-        schema "$ref" => "#/components/schemas/loan"
+        schema OpenapiSchemas.data(:loan)
         example "application/json", :borrowed, {
-          rented_at: "2026-10-01T10:15:00Z",
-          due_at: "2026-10-31T10:15:00Z",
-          returned_at: nil,
-          member_number: "000042"
+          data: {
+            rented_at: "2026-10-01T10:15:00Z",
+            due_at: "2026-10-31T10:15:00Z",
+            returned_at: nil,
+            member_number: "000042"
+          }
         }
 
         run_test! do |response|
-          expect(response.parsed_body["member_number"]).to eq(member.member_number)
-          expect(Time.zone.parse(response.parsed_body["due_at"])).to be_future
+          expect(response.parsed_body.dig("data", "member_number")).to eq(member.member_number)
+          expect(Time.zone.parse(response.parsed_body.dig("data", "due_at"))).to be_future
           expect(item.reload).to be_loaned
           expect(item.active_loan.member).to eq(member)
         end

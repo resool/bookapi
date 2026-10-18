@@ -40,6 +40,8 @@ gem "image_processing", "~> 1.2"
 
 # Alba is a JSON serializer for Ruby, JRuby, and TruffleRuby.
 gem "alba", "~> 4.0.0"
+# Agile pagination
+gem "pagy", "~> 43.8"
 
 # Catch unsafe migrations in development
 gem "strong_migrations", "~> 2.8.0"

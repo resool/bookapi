@@ -42,6 +42,39 @@ module OpenapiSchemas
       member_number: { type: :string, example: "000042" }
     }
   }.freeze
+
+  PAGINATION_META = {
+    type: :object,
+    required: %w[page limit count pages],
+    properties: {
+      page: { type: :integer, example: 1 },
+      limit: { type: :integer, example: 20 },
+      count: { type: :integer, example: 42, description: "Total number of records" },
+      pages: { type: :integer, example: 3 }
+    }
+  }.freeze
+
+  PAGINATION_PARAMS = [
+    { name: :page, in: :query, required: false, schema: { type: :integer, minimum: 1, default: 1 } },
+    { name: :limit, in: :query, required: false, schema: { type: :integer, minimum: 1, maximum: 100, default: 20 } }
+  ].freeze
+
+  module_function
+
+  def data(ref)
+    { type: :object, required: %w[data], properties: { data: { "$ref" => "#/components/schemas/#{ref}" } } }
+  end
+
+  def paginated(ref)
+    {
+      type: :object,
+      required: %w[data meta],
+      properties: {
+        data: { type: :array, items: { "$ref" => "#/components/schemas/#{ref}" } },
+        meta: { "$ref" => "#/components/schemas/pagination_meta" }
+      }
+    }
+  end
 end
 
 module OpenapiErrorExamples
@@ -71,6 +104,7 @@ RSpec.configure do |config|
       components: {
         schemas: {
           errors_object: OpenapiSchemas::ERRORS_OBJECT,
+          pagination_meta: OpenapiSchemas::PAGINATION_META,
           loan: OpenapiSchemas::LOAN,
           book: {
             type: :object,
@@ -94,6 +128,7 @@ RSpec.configure do |config|
       servers:,
       components: {
         schemas: {
+          pagination_meta: OpenapiSchemas::PAGINATION_META,
           book: {
             type: :object,
             required: %w[available title description authors],

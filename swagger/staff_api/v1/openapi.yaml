@@ -21,7 +21,12 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/book"
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/book"
         '404':
           description: edition not found
           content:
@@ -122,8 +127,58 @@ paths:
           description: book with loan history
           content:
             application/json:
+              examples:
+                currently_loaned:
+                  value:
+                    data:
+                      sku: '000123'
+                      condition: good
+                      title: Anne of Green Gables
+                      description: An orphan girl is mistakenly sent to live with
+                        an elderly brother and sister on Prince Edward Island.
+                      authors:
+                      - Lucy Maud Montgomery
+                      status: loaned
+                      loans:
+                      - rented_at: '2026-06-02T09:30:00Z'
+                        due_at: '2026-07-02T09:30:00Z'
+                        returned_at: '2026-06-14T17:05:00Z'
+                        member_number: '000017'
+                      - rented_at: '2026-08-11T12:00:00Z'
+                        due_at: '2026-09-10T12:00:00Z'
+                        returned_at: '2026-09-14T10:20:00Z'
+                        member_number: '000042'
+                      - rented_at: '2026-10-01T10:15:00Z'
+                        due_at: '2026-10-31T10:15:00Z'
+                        returned_at:
+                        member_number: '000108'
+                available:
+                  value:
+                    data:
+                      sku: '000123'
+                      condition: good
+                      title: Anne of Green Gables
+                      description: An orphan girl is mistakenly sent to live with
+                        an elderly brother and sister on Prince Edward Island.
+                      authors:
+                      - Lucy Maud Montgomery
+                      status: available
+                      loans:
+                      - rented_at: '2026-06-02T09:30:00Z'
+                        due_at: '2026-07-02T09:30:00Z'
+                        returned_at: '2026-06-14T17:05:00Z'
+                        member_number: '000017'
+                      - rented_at: '2026-08-11T12:00:00Z'
+                        due_at: '2026-09-10T12:00:00Z'
+                        returned_at: '2026-09-14T10:20:00Z'
+                        member_number: '000042'
               schema:
-                "$ref": "#/components/schemas/book_with_loans"
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/book_with_loans"
         '404':
           description: book not found
           content:
@@ -141,15 +196,39 @@ paths:
       summary: List books with their status
       tags:
       - Books
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
       responses:
         '200':
           description: books listed
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  "$ref": "#/components/schemas/book"
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/book"
+                  meta:
+                    "$ref": "#/components/schemas/pagination_meta"
   "/staff-api/v1/books/{sku}/loans":
     post:
       summary: Borrow a book
@@ -169,12 +248,18 @@ paths:
               examples:
                 borrowed:
                   value:
-                    rented_at: '2026-10-01T10:15:00Z'
-                    due_at: '2026-10-15T10:15:00Z'
-                    returned_at:
-                    member_number: '000042'
+                    data:
+                      rented_at: '2026-10-01T10:15:00Z'
+                      due_at: '2026-10-31T10:15:00Z'
+                      returned_at:
+                      member_number: '000042'
               schema:
-                "$ref": "#/components/schemas/loan"
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/loan"
         '404':
           description: book not found
           content:
@@ -257,12 +342,18 @@ paths:
               examples:
                 returned:
                   value:
-                    rented_at: '2026-10-01T10:15:00Z'
-                    due_at: '2026-10-15T10:15:00Z'
-                    returned_at: '2026-10-12T16:40:00Z'
-                    member_number: '000042'
+                    data:
+                      rented_at: '2026-10-01T10:15:00Z'
+                      due_at: '2026-10-31T10:15:00Z'
+                      returned_at: '2026-10-12T16:40:00Z'
+                      member_number: '000042'
               schema:
-                "$ref": "#/components/schemas/loan"
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/loan"
         '409':
           description: book is not loaned
           content:
@@ -310,6 +401,27 @@ components:
               message:
                 type: string
                 example: Book 000123 is currently loaned
+    pagination_meta:
+      type: object
+      required:
+      - page
+      - limit
+      - count
+      - pages
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 20
+        count:
+          type: integer
+          example: 42
+          description: Total number of records
+        pages:
+          type: integer
+          example: 3
     loan:
       type: object
       required:
@@ -325,7 +437,7 @@ components:
         due_at:
           type: string
           format: date-time
-          example: '2026-10-15T10:15:00Z'
+          example: '2026-10-31T10:15:00Z'
         returned_at:
           type: string
           format: date-time

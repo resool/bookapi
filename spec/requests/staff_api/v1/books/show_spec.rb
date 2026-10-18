@@ -11,7 +11,7 @@ RSpec.describe "Staff API: show book", openapi_spec: "staff_api/v1/openapi.yaml"
       let(:sku) { item.sku }
 
       response "200", "book with loan history" do
-        schema "$ref" => "#/components/schemas/book_with_loans"
+        schema OpenapiSchemas.data(:book_with_loans)
 
         book = {
           sku: "000123",
@@ -27,14 +27,14 @@ RSpec.describe "Staff API: show book", openapi_spec: "staff_api/v1/openapi.yaml"
             returned_at: "2026-09-14T10:20:00Z", member_number: "000042" }
         ]
 
-        example "application/json", :currently_loaned, book.merge(
+        example "application/json", :currently_loaned, data: book.merge(
           status: "loaned",
           loans: past_loans + [
             { rented_at: "2026-10-01T10:15:00Z", due_at: "2026-10-31T10:15:00Z",
               returned_at: nil, member_number: "000108" }
           ]
         )
-        example "application/json", :available, book.merge(status: "available", loans: past_loans)
+        example "application/json", :available, data: book.merge(status: "available", loans: past_loans)
 
         let(:past_reader) { create(:member) }
         let(:current_reader) { create(:member) }
@@ -46,7 +46,7 @@ RSpec.describe "Staff API: show book", openapi_spec: "staff_api/v1/openapi.yaml"
         end
 
         run_test! do |response|
-          loans = response.parsed_body["loans"]
+          loans = response.parsed_body.dig("data", "loans")
           expect(loans.pluck("member_number")).to contain_exactly(past_reader.member_number, current_reader.member_number)
           expect(loans.pluck("returned_at").compact.size).to eq(1)
         end

@@ -22,10 +22,10 @@ RSpec.describe "Staff API: create book", openapi_spec: "staff_api/v1/openapi.yam
       let(:params) { { sku: "000123", condition: "new" } }
 
       response "201", "book created" do
-        schema "$ref" => "#/components/schemas/book"
+        schema OpenapiSchemas.data(:book)
 
         run_test! do |response|
-          body = response.parsed_body
+          body = response.parsed_body["data"]
           expect(body).to include("sku" => "000123", "status" => "available", "title" => edition.title)
           expect(edition.items.find_by(sku: "000123")).to be_available
         end

@@ -5,6 +5,7 @@ RSpec.describe "Public API: list books", openapi_spec: "public_api/v1/openapi.ya
     get "List books with availability" do
       tags "Books"
       produces "application/json"
+      OpenapiSchemas::PAGINATION_PARAMS.each { |param| parameter(param.deep_dup) }
 
       let!(:available) { create(:item, status: :available) }
       let!(:loaned) { create(:item, status: :loaned) }
@@ -15,12 +16,13 @@ RSpec.describe "Public API: list books", openapi_spec: "public_api/v1/openapi.ya
       end
 
       response "200", "books listed" do
-        schema type: :array, items: { "$ref" => "#/components/schemas/book" }
+        schema OpenapiSchemas.paginated(:book)
 
         run_test! do |response|
           body = response.parsed_body
-          expect(body.pluck("title")).to contain_exactly(available.edition.title, loaned.edition.title)
-          expect(body.pluck("available")).to contain_exactly(true, false)
+          expect(body["data"].pluck("title")).to contain_exactly(available.edition.title, loaned.edition.title)
+          expect(body["data"].pluck("available")).to contain_exactly(true, false)
+          expect(body["meta"]).to include("count" => 2)
         end
       end
     end
