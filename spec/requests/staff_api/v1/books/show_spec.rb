@@ -18,7 +18,7 @@ RSpec.describe "Staff API: show book", openapi_spec: "staff_api/v1/openapi.yaml"
           condition: "good",
           title: "Anne of Green Gables",
           description: "An orphan girl is mistakenly sent to live with an elderly brother and sister on Prince Edward Island.",
-          authors: ["Lucy Maud Montgomery"]
+          authors: [ "Lucy Maud Montgomery" ]
         }
         past_loans = [
           { rented_at: "2026-06-02T09:30:00Z", due_at: "2026-07-02T09:30:00Z",

@@ -21,7 +21,7 @@ module OpenapiSchemas
     }
   }.freeze
 
-  AUTHORS = { type: :array, items: { type: :string }, example: ["Lucy Maud Montgomery"] }.freeze
+  AUTHORS = { type: :array, items: { type: :string }, example: [ "Lucy Maud Montgomery" ] }.freeze
 
   STAFF_BOOK_PROPERTIES = {
     sku: { type: :string, example: "000123" },
@@ -46,7 +46,7 @@ end
 
 module OpenapiErrorExamples
   def error_example(name, code, message)
-    example "application/json", name, { errors: [{ code:, message: }] }
+    example "application/json", name, { errors: [ { code:, message: } ] }
   end
 end
 
@@ -60,7 +60,7 @@ RSpec.configure do |config|
 
   config.openapi_root = Rails.root.join("swagger").to_s
 
-  servers = [{ url: "http://localhost:3000" }]
+  servers = [ { url: "http://localhost:3000" } ]
 
   config.openapi_specs = {
     "staff_api/v1/openapi.yaml" => {
