@@ -1,1 +1,7 @@
 loan_period_days: 30
+reminders:
+  before_due_date:
+    enabled: true
+    days_before: 3
+  due_date:
+    enabled: true

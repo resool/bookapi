@@ -1,0 +1,7 @@
+Hi <%= @member.name %>,
+
+"<%= @edition.title %>" (copy <%= @loan.item.sku %>) is due back today, <%= l(@loan.due_at.to_date, format: :long) %>.
+
+Please return it today to avoid having your borrowing paused.
+
+Your library

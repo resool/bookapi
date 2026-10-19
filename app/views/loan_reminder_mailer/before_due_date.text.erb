@@ -1,0 +1,7 @@
+Hi <%= @member.name %>,
+
+this is a reminder that "<%= @edition.title %>" (copy <%= @loan.item.sku %>) is due back on <%= l(@loan.due_at.to_date, format: :long) %>.
+
+Please return it by then or visit the library to extend the loan.
+
+Your library

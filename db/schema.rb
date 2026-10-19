@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_150100) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -80,6 +80,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_150100) do
     t.datetime "returned_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "before_due_date_reminder_sent_at"
+    t.datetime "due_date_reminder_sent_at"
     t.index ["item_id"], name: "index_loans_on_item_id"
     t.index ["item_id"], name: "index_loans_on_item_id_active", unique: true, where: "(returned_at IS NULL)"
     t.index ["member_id"], name: "index_loans_on_member_id"

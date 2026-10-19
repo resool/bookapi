@@ -17,3 +17,9 @@ en:
       # Idempotency-Key handling
       idempotency_key_reused: "Idempotency-Key was already used with a different request"
       request_in_progress: "A request with this Idempotency-Key is still being processed"
+
+  loan_reminder_mailer:
+    before_due_date:
+      subject: "Reminder: \"%{title}\" is due in a few days"
+    due_date:
+      subject: "\"%{title}\" is due today"
