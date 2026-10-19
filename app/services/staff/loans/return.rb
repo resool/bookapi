@@ -9,7 +9,7 @@ module Staff
       def call
         Item.transaction do
           loan = item.loans.active.lock.first
-          raise Errors::BookNotLoaned, "Book #{item.sku} is not currently loaned" unless loan
+          raise Errors::BookNotLoaned.new(sku: item.sku) unless loan
 
           loan.update!(returned_at: Time.current)
           item.available!

@@ -17,7 +17,7 @@ module Staff
       def validate!
         return unless item.loaned?
 
-        raise Staff::Errors::BookLoaned, "Book #{item.sku} is currently loaned and cannot be withdrawn"
+        raise Staff::Errors::BookLoaned.new(sku: item.sku)
       end
 
       def mark_as_removed

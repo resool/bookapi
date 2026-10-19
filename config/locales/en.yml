@@ -1,31 +1,19 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
 en:
-  hello: "Hello world"
+  staff_api:
+    errors:
+      # domain errors (Staff::Errors::*), keyed by error code
+      book_loaned: "Book %{sku} is currently loaned and cannot be withdrawn"
+      book_not_available: "Book %{sku} is not available"
+      book_not_loaned: "Book %{sku} is not currently loaned"
+      member_not_found: "Member with card number %{member_number} not found"
+      member_suspended: "Member %{member_number} is suspended"
+      member_closed: "Member %{member_number} has a closed account"
+      member_has_overdue_loans: "Member %{member_number} has overdue loans"
+      edition_already_exists: "Edition with ISBN %{isbn} already exists; add a copy with POST /staff-api/v1/editions/:edition_id/books"
+      authors_missing: "At least one author is required"
+      book_not_found: "Book not found"
+      edition_not_found: "Edition not found"
+      not_found: "Record not found"
+      # Idempotency-Key handling
+      idempotency_key_reused: "Idempotency-Key was already used with a different request"
+      request_in_progress: "A request with this Idempotency-Key is still being processed"

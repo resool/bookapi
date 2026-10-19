@@ -166,7 +166,7 @@ paths:
                   value:
                     errors:
                     - code: book_not_found
-                      message: Book with SKU 000123 not found
+                      message: Book not found
               schema:
                 "$ref": "#/components/schemas/errors_object"
     get:
@@ -245,7 +245,7 @@ paths:
                   value:
                     errors:
                     - code: book_not_found
-                      message: Book with SKU 000123 not found
+                      message: Book not found
               schema:
                 "$ref": "#/components/schemas/errors_object"
   "/staff-api/v1/books/{sku}/loans":
@@ -288,7 +288,7 @@ paths:
                   value:
                     errors:
                     - code: book_not_found
-                      message: Book with SKU 000123 not found
+                      message: Book not found
               schema:
                 "$ref": "#/components/schemas/errors_object"
         '409':
@@ -363,17 +363,21 @@ paths:
                 returned:
                   value:
                     data:
-                      rented_at: '2026-10-01T10:15:00Z'
-                      due_at: '2026-10-31T10:15:00Z'
-                      returned_at: '2026-10-12T16:40:00Z'
-                      member_number: '000042'
+                      sku: '000123'
+                      condition: good
+                      status: available
+                      title: Anne of Green Gables
+                      description: An orphan girl is mistakenly sent to live with
+                        an elderly brother and sister on Prince Edward Island.
+                      authors:
+                      - Lucy Maud Montgomery
               schema:
                 type: object
                 required:
                 - data
                 properties:
                   data:
-                    "$ref": "#/components/schemas/loan"
+                    "$ref": "#/components/schemas/book"
         '409':
           description: book is not loaned
           content:
@@ -395,7 +399,7 @@ paths:
                   value:
                     errors:
                     - code: book_not_found
-                      message: Book with SKU 000123 not found
+                      message: Book not found
               schema:
                 "$ref": "#/components/schemas/errors_object"
   "/staff-api/v1/editions/{edition_id}/books":
@@ -451,7 +455,7 @@ paths:
                   value:
                     errors:
                     - code: edition_not_found
-                      message: Edition with id 42 not found
+                      message: Edition not found
               schema:
                 "$ref": "#/components/schemas/errors_object"
         '422':

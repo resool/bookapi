@@ -41,7 +41,7 @@ RSpec.describe "Staff API: borrow book", openapi_spec: "staff_api/v1/openapi.yam
 
       response "404", "book not found" do
         schema "$ref" => "#/components/schemas/errors_object"
-        error_example :book_not_found, "book_not_found", "Book with SKU 000123 not found"
+        error_example :book_not_found, "book_not_found", "Book not found"
         let(:sku) { "missing" }
 
         run_test! do |response|

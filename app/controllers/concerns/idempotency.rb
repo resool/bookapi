@@ -39,11 +39,11 @@ module Idempotency
   def replay(record)
     if record.request_fingerprint != request_fingerprint
       render_errors(:unprocessable_content, [
-        { code: "idempotency_key_reused", message: "Idempotency-Key was already used with a different request" }
+        { code: "idempotency_key_reused", message: error_message("idempotency_key_reused") }
       ])
     elsif record.in_progress?
       render_errors(:conflict, [
-        { code: "request_in_progress", message: "A request with this Idempotency-Key is still being processed" }
+        { code: "request_in_progress", message: error_message("request_in_progress") }
       ])
     else
       response.set_header("Idempotent-Replayed", "true")

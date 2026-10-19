@@ -3,14 +3,13 @@ module ApiErrorHandling
 
   NOT_FOUND_CODES = {
     "Item" => "book_not_found",
-    "Edition" => "edition_not_found",
-    "Member" => "member_not_found"
+    "Edition" => "edition_not_found"
   }.freeze
 
   included do
     rescue_from ActiveRecord::RecordNotFound do |error|
       code = NOT_FOUND_CODES.fetch(error.model, "not_found")
-      render_errors(:not_found, [ { code:, message: code.humanize } ])
+      render_errors(:not_found, [ { code:, message: error_message(code) } ])
     end
 
     rescue_from ActiveRecord::RecordInvalid do |error|
@@ -28,6 +27,11 @@ module ApiErrorHandling
   end
 
   private
+
+  # staff_api.errors.* or public_api.errors.*,
+  def error_message(code)
+    I18n.t(code, scope: "#{controller_path.split("/").first}.errors", default: :not_found)
+  end
 
   def render_errors(status, errors)
     render json: { errors: }, status:

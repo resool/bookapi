@@ -52,7 +52,7 @@ RSpec.describe "Staff API: add copy to edition", openapi_spec: "staff_api/v1/ope
 
       response "404", "edition not found" do
         schema "$ref" => "#/components/schemas/errors_object"
-        error_example :edition_not_found, "edition_not_found", "Edition with id 42 not found"
+        error_example :edition_not_found, "edition_not_found", "Edition not found"
         let(:edition_id) { 0 }
 
         run_test! do |response|

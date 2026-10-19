@@ -24,13 +24,12 @@ module Staff
       attr_reader :title, :author_names, :condition, :edition_attributes
 
       def validate!
-        raise Errors::AuthorsMissing, "At least one author is required" if author_names.empty?
+        raise Errors::AuthorsMissing if author_names.empty?
 
         isbn = Edition.normalize_value_for(:isbn, edition_attributes[:isbn])
         return if isbn.blank? || !Edition.exists?(isbn:)
 
-        raise Errors::EditionAlreadyExists,
-              "Edition with ISBN #{isbn} already exists; add a copy with POST /staff-api/v1/editions/:edition_id/books"
+        raise Errors::EditionAlreadyExists.new(isbn:)
       end
 
       def find_or_create_authors

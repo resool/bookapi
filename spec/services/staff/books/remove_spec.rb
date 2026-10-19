@@ -32,4 +32,3 @@ describe Staff::Books::Remove do
     end
   end
 end
-

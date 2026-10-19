@@ -18,11 +18,11 @@ module Staff
       attr_reader :item, :member, :now
 
       def validate_member!
-        raise Errors::MemberSuspended, "Member #{member.member_number} is suspended" if member.suspended?
-        raise Errors::MemberClosed, "Member #{member.member_number} has a closed account" if member.closed?
+        raise Errors::MemberSuspended.new(member_number: member.member_number) if member.suspended?
+        raise Errors::MemberClosed.new(member_number: member.member_number) if member.closed?
         return unless member.loans.overdue.exists?
 
-        raise Errors::MemberHasOverdueLoans, "Member #{member.member_number} has overdue loans"
+        raise Errors::MemberHasOverdueLoans.new(member_number: member.member_number)
       end
 
       def loan_book
@@ -38,7 +38,7 @@ module Staff
       end
 
       def raise_not_available
-        raise Errors::BookNotAvailable, "Book #{item.sku} is not available"
+        raise Errors::BookNotAvailable.new(sku: item.sku)
       end
     end
   end

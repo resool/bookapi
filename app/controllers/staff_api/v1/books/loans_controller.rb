@@ -8,7 +8,7 @@ module StaffApi
         def create
           item = Item.find_by!(sku: params[:book_sku])
           member = Member.find_by(member_number: params[:member_number])
-          raise Staff::Errors::MemberNotFound, "Member with card number #{params[:member_number]} not found" unless member
+          raise Staff::Errors::MemberNotFound.new(member_number: params[:member_number]) unless member
 
           loan = Staff::Loans::Create.new(item:, member:).call
 
