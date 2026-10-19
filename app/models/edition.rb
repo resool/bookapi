@@ -6,7 +6,7 @@ class Edition < ApplicationRecord
 
   normalizes :isbn, with: ->(isbn) { isbn.delete("- ").presence }
 
-  validates :title, :description, :publisher, :published_year, presence: true
+  validates :title, presence: true
   validates :isbn, uniqueness: true, allow_nil: true
 
   scope :in_circulation, -> { where(id: Item.where.not(status: :withdrawn).pluck(:edition_id)) }

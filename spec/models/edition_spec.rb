@@ -10,9 +10,6 @@ RSpec.describe Edition do
 
   describe "validations" do
     it { is_expected.to validate_presence_of(:title) }
-    it { is_expected.to validate_presence_of(:description) }
-    it { is_expected.to validate_presence_of(:publisher) }
-    it { is_expected.to validate_presence_of(:published_year) }
     it { is_expected.to validate_uniqueness_of(:isbn).allow_nil.case_insensitive }
   end
 

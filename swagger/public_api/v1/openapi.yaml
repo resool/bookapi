@@ -83,13 +83,16 @@ components:
           example: Anne of Green Gables
         description:
           type: string
+          nullable: true
           example: An orphan girl is mistakenly sent to live with an elderly brother
             and sister on Prince Edward Island.
         publisher:
           type: string
+          nullable: true
           example: L.C. Page & Co.
         published_year:
           type: integer
+          nullable: true
           example: 1908
         authors:
           type: array

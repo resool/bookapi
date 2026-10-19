@@ -17,13 +17,17 @@ module StaffApi
         render_data(BookSerializer.new(item, with_traits: :with_loans).serializable_hash)
       end
 
-      # POST /staff-api/v1/editions/:edition_id/books
+      # POST /staff-api/v1/books
       def create
-        edition = Edition.find(params[:edition_id])
-        item = Staff::Books::Create.new(
-          edition:,
+        item = Staff::Books::CreateWithEdition.new(
+          title: params[:title],
+          authors: params[:authors],
           condition: params[:condition],
-          acquired_on: params[:acquired_on]
+          description: params[:description],
+          publisher: params[:publisher],
+          published_year: params[:published_year],
+          isbn: params[:isbn],
+          translator: params[:translator]
         ).call
 
         render_data(BookSerializer.new(item).serializable_hash, status: :created)

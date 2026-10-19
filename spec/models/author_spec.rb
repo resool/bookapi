@@ -10,5 +10,10 @@ RSpec.describe Author do
 
   describe "validations" do
     it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to have_db_index(:name).unique }
+  end
+
+  describe "normalization" do
+    it { is_expected.to normalize(:name).from("  Terry   Pratchett ").to("Terry Pratchett") }
   end
 end

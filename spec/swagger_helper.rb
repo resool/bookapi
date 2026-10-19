@@ -28,7 +28,7 @@ module OpenapiSchemas
     condition: { type: :string, example: "good" },
     status: { type: :string, enum: %w[available loaned in_repair lost withdrawn], example: "available" },
     title: { type: :string, example: "Anne of Green Gables" },
-    description: { type: :string, example: "An orphan girl is mistakenly sent to live with an elderly brother and sister on Prince Edward Island." },
+    description: { type: :string, nullable: true, example: "An orphan girl is mistakenly sent to live with an elderly brother and sister on Prince Edward Island." },
     authors: AUTHORS
   }.freeze
 
@@ -135,9 +135,9 @@ RSpec.configure do |config|
             additionalProperties: false,
             properties: {
               title: { type: :string, example: "Anne of Green Gables" },
-              description: { type: :string, example: "An orphan girl is mistakenly sent to live with an elderly brother and sister on Prince Edward Island." },
-              publisher: { type: :string, example: "L.C. Page & Co." },
-              published_year: { type: :integer, example: 1908 },
+              description: { type: :string, nullable: true, example: "An orphan girl is mistakenly sent to live with an elderly brother and sister on Prince Edward Island." },
+              publisher: { type: :string, nullable: true, example: "L.C. Page & Co." },
+              published_year: { type: :integer, nullable: true, example: 1908 },
               authors: OpenapiSchemas::AUTHORS,
               available_copies: { type: :integer, minimum: 0, example: 2, description: "Copies that can be borrowed right now; 0 means the book is currently unavailable" }
             }

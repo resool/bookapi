@@ -10,10 +10,10 @@ Rails.application.routes.draw do
   namespace :staff_api, path: "staff-api" do
     namespace :v1 do
       resources :editions, only: [] do
-        resources :books, only: :create
+        resources :books, only: :create, module: :editions
       end
 
-      resources :books, only: %i[ index show destroy ], param: :sku do
+      resources :books, only: %i[ index show create destroy ], param: :sku do
         scope module: :books do
           resources :loans, only: :create
           resource :return, only: :create

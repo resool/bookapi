@@ -4,17 +4,15 @@ info:
   title: Library Staff API
   version: v1
 paths:
-  "/staff-api/v1/editions/{edition_id}/books":
+  "/staff-api/v1/books":
     post:
-      summary: Add a book copy to an edition
+      summary: Add a new book (title, authors, first copy)
       tags:
       - Books
+      description: Creates the work, its authors (matched by name) and the edition,
+        then the first copy with a generated SKU. To add another copy of a book the
+        library already has, use POST /staff-api/v1/editions/{edition_id}/books.
       parameters:
-      - name: edition_id
-        in: path
-        required: true
-        schema:
-          type: integer
       - name: Idempotency-Key
         in: header
         required: false
@@ -22,7 +20,7 @@ paths:
           type: string
           format: uuid
         description: Send the same key when retrying a request; a repeated key replays
-          the first response instead of creating another copy.
+          the first response instead of creating another book.
       responses:
         '201':
           description: book created
@@ -35,46 +33,27 @@ paths:
                 properties:
                   data:
                     "$ref": "#/components/schemas/book"
-        '409':
-          description: request with this Idempotency-Key is still being processed
-          content:
-            application/json:
-              examples:
-                request_in_progress:
-                  value:
-                    errors:
-                    - code: request_in_progress
-                      message: A request with this Idempotency-Key is still being
-                        processed
-              schema:
-                "$ref": "#/components/schemas/errors_object"
-        '404':
-          description: edition not found
-          content:
-            application/json:
-              examples:
-                edition_not_found:
-                  value:
-                    errors:
-                    - code: edition_not_found
-                      message: Edition with id 42 not found
-              schema:
-                "$ref": "#/components/schemas/errors_object"
         '422':
           description: invalid params
           content:
             application/json:
               examples:
-                condition_missing:
+                authors_missing:
+                  value:
+                    errors:
+                    - code: authors_missing
+                      message: At least one author is required
+                edition_already_exists:
+                  value:
+                    errors:
+                    - code: edition_already_exists
+                      message: Edition with ISBN 9780575048003 already exists; add
+                        a copy with POST /staff-api/v1/editions/:edition_id/books
+                title_missing:
                   value:
                     errors:
                     - code: validation_failed
-                      message: Condition can't be blank
-                idempotency_key_reused:
-                  value:
-                    errors:
-                    - code: idempotency_key_reused
-                      message: Idempotency-Key was already used with a different request
+                      message: Title can't be blank
               schema:
                 "$ref": "#/components/schemas/errors_object"
       requestBody:
@@ -83,14 +62,75 @@ paths:
             schema:
               type: object
               required:
+              - title
+              - authors
               - condition
               properties:
+                title:
+                  type: string
+                  example: Good Omens
+                authors:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                  example:
+                  - Terry Pratchett
+                  - Neil Gaiman
                 condition:
                   type: string
                   example: new
-                acquired_on:
+                description:
                   type: string
-                  format: date
+                  example: The apocalypse, but funny.
+                publisher:
+                  type: string
+                  example: Gollancz
+                published_year:
+                  type: integer
+                  example: 1990
+                isbn:
+                  type: string
+                  example: 978-0-575-04800-3
+                translator:
+                  type: string
+    get:
+      summary: List books with their status
+      tags:
+      - Books
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: books listed
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/book"
+                  meta:
+                    "$ref": "#/components/schemas/pagination_meta"
   "/staff-api/v1/books/{sku}":
     delete:
       summary: Withdraw a book copy (soft delete)
@@ -208,44 +248,6 @@ paths:
                       message: Book with SKU 000123 not found
               schema:
                 "$ref": "#/components/schemas/errors_object"
-  "/staff-api/v1/books":
-    get:
-      summary: List books with their status
-      tags:
-      - Books
-      parameters:
-      - name: page
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 1
-          default: 1
-      - name: limit
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          default: 20
-      responses:
-        '200':
-          description: books listed
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - data
-                - meta
-                properties:
-                  data:
-                    type: array
-                    items:
-                      "$ref": "#/components/schemas/book"
-                  meta:
-                    "$ref": "#/components/schemas/pagination_meta"
   "/staff-api/v1/books/{sku}/loans":
     post:
       summary: Borrow a book
@@ -396,6 +398,93 @@ paths:
                       message: Book with SKU 000123 not found
               schema:
                 "$ref": "#/components/schemas/errors_object"
+  "/staff-api/v1/editions/{edition_id}/books":
+    post:
+      summary: Add a book copy to an edition
+      tags:
+      - Books
+      parameters:
+      - name: edition_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          format: uuid
+        description: Send the same key when retrying a request; a repeated key replays
+          the first response instead of creating another copy.
+      responses:
+        '201':
+          description: book created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    "$ref": "#/components/schemas/book"
+        '409':
+          description: request with this Idempotency-Key is still being processed
+          content:
+            application/json:
+              examples:
+                request_in_progress:
+                  value:
+                    errors:
+                    - code: request_in_progress
+                      message: A request with this Idempotency-Key is still being
+                        processed
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '404':
+          description: edition not found
+          content:
+            application/json:
+              examples:
+                edition_not_found:
+                  value:
+                    errors:
+                    - code: edition_not_found
+                      message: Edition with id 42 not found
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+        '422':
+          description: invalid params
+          content:
+            application/json:
+              examples:
+                condition_missing:
+                  value:
+                    errors:
+                    - code: validation_failed
+                      message: Condition can't be blank
+                idempotency_key_reused:
+                  value:
+                    errors:
+                    - code: idempotency_key_reused
+                      message: Idempotency-Key was already used with a different request
+              schema:
+                "$ref": "#/components/schemas/errors_object"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - condition
+              properties:
+                condition:
+                  type: string
+                  example: new
+                acquired_on:
+                  type: string
+                  format: date
 servers:
 - url: http://localhost:3000
 components:
@@ -496,6 +585,7 @@ components:
           example: Anne of Green Gables
         description:
           type: string
+          nullable: true
           example: An orphan girl is mistakenly sent to live with an elderly brother
             and sister on Prince Edward Island.
         authors:
@@ -536,6 +626,7 @@ components:
           example: Anne of Green Gables
         description:
           type: string
+          nullable: true
           example: An orphan girl is mistakenly sent to live with an elderly brother
             and sister on Prince Edward Island.
         authors:

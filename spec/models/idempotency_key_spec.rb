@@ -6,12 +6,7 @@ RSpec.describe IdempotencyKey do
   describe "validations" do
     it { is_expected.to validate_presence_of(:key) }
     it { is_expected.to validate_presence_of(:request_fingerprint) }
-
-    it "enforces key uniqueness in the database" do
-      create(:idempotency_key, key: "abc")
-
-      expect { create(:idempotency_key, key: "abc") }.to raise_error(ActiveRecord::RecordNotUnique)
-    end
+    it { is_expected.to have_db_index(:key).unique }
   end
 
   describe ".fingerprint" do
