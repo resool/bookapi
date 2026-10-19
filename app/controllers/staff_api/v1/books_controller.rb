@@ -1,6 +1,8 @@
 module StaffApi
   module V1
     class BooksController < BaseController
+      around_action :idempotent, only: :create
+
       # GET /staff-api/v1/books
       def index
         items = Item.where.not(status: :withdrawn).includes(edition: { work: :authors }).order(:id)
@@ -20,7 +22,6 @@ module StaffApi
         edition = Edition.find(params[:edition_id])
         item = Staff::Books::Create.new(
           edition:,
-          sku: params[:sku],
           condition: params[:condition],
           acquired_on: params[:acquired_on]
         ).call

@@ -15,6 +15,14 @@ paths:
         required: true
         schema:
           type: integer
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          format: uuid
+        description: Send the same key when retrying a request; a repeated key replays
+          the first response instead of creating another copy.
       responses:
         '201':
           description: book created
@@ -27,6 +35,19 @@ paths:
                 properties:
                   data:
                     "$ref": "#/components/schemas/book"
+        '409':
+          description: request with this Idempotency-Key is still being processed
+          content:
+            application/json:
+              examples:
+                request_in_progress:
+                  value:
+                    errors:
+                    - code: request_in_progress
+                      message: A request with this Idempotency-Key is still being
+                        processed
+              schema:
+                "$ref": "#/components/schemas/errors_object"
         '404':
           description: edition not found
           content:
@@ -44,16 +65,16 @@ paths:
           content:
             application/json:
               examples:
-                sku_taken:
-                  value:
-                    errors:
-                    - code: validation_failed
-                      message: Sku has already been taken
                 condition_missing:
                   value:
                     errors:
                     - code: validation_failed
                       message: Condition can't be blank
+                idempotency_key_reused:
+                  value:
+                    errors:
+                    - code: idempotency_key_reused
+                      message: Idempotency-Key was already used with a different request
               schema:
                 "$ref": "#/components/schemas/errors_object"
       requestBody:
@@ -62,12 +83,8 @@ paths:
             schema:
               type: object
               required:
-              - sku
               - condition
               properties:
-                sku:
-                  type: string
-                  example: '000123'
                 condition:
                   type: string
                   example: new
@@ -321,6 +338,7 @@ paths:
               properties:
                 member_number:
                   type: string
+                  pattern: "^\\d{6}$"
                   example: '000042'
                   description: Library card number
   "/staff-api/v1/books/{sku}/return":
@@ -445,6 +463,7 @@ components:
           example:
         member_number:
           type: string
+          pattern: "^\\d{6}$"
           example: '000042'
     book:
       type: object
@@ -458,6 +477,7 @@ components:
       properties:
         sku:
           type: string
+          pattern: "^\\d{6}$"
           example: '000123'
         condition:
           type: string
@@ -497,6 +517,7 @@ components:
       properties:
         sku:
           type: string
+          pattern: "^\\d{6}$"
           example: '000123'
         condition:
           type: string

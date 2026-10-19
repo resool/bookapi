@@ -25,17 +25,11 @@ describe Staff::Books::Remove do
 
       it "raises a conflict error and keeps the book loaned" do
         expect { call }.to raise_error(
-          described_class::BookLoaned,
+          Staff::Errors::BookLoaned,
           "Book 000123 is currently loaned and cannot be withdrawn"
         ).and not_change { item.reload.status }
       end
     end
   end
-
-  describe described_class::BookLoaned do
-    subject(:error) { described_class.new }
-
-    it { is_expected.to be_a(Staff::ConflictError) }
-    it { expect(error.code).to eq("book_loaned") }
-  end
 end
+

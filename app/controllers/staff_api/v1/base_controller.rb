@@ -3,6 +3,7 @@ module StaffApi
     class BaseController < ApplicationController
       include ApiErrorHandling
       include ApiResponses
+      include Idempotency
     end
   end
 end

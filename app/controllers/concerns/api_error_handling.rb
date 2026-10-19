@@ -18,11 +18,11 @@ module ApiErrorHandling
       render_errors(:unprocessable_content, errors)
     end
 
-    rescue_from Staff::ConflictError do |error|
+    rescue_from Staff::Errors::ConflictError do |error|
       render_errors(:conflict, [ { code: error.code, message: error.message } ])
     end
 
-    rescue_from Staff::UnprocessableError do |error|
+    rescue_from Staff::Errors::UnprocessableError do |error|
       render_errors(:unprocessable_content, [ { code: error.code, message: error.message } ])
     end
   end
