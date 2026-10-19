@@ -6,7 +6,7 @@ info:
 paths:
   "/public-api/v1/books":
     get:
-      summary: List books with availability
+      summary: List book editions with availability
       tags:
       - Books
       parameters:
@@ -27,7 +27,7 @@ paths:
           default: 20
       responses:
         '200':
-          description: books listed
+          description: editions listed
           content:
             application/json:
               schema:
@@ -70,15 +70,14 @@ components:
     book:
       type: object
       required:
-      - available
       - title
       - description
+      - publisher
+      - published_year
       - authors
+      - available_copies
       additionalProperties: false
       properties:
-        available:
-          type: boolean
-          example: true
         title:
           type: string
           example: Anne of Green Gables
@@ -86,9 +85,21 @@ components:
           type: string
           example: An orphan girl is mistakenly sent to live with an elderly brother
             and sister on Prince Edward Island.
+        publisher:
+          type: string
+          example: L.C. Page & Co.
+        published_year:
+          type: integer
+          example: 1908
         authors:
           type: array
           items:
             type: string
           example:
           - Lucy Maud Montgomery
+        available_copies:
+          type: integer
+          minimum: 0
+          example: 2
+          description: Copies that can be borrowed right now; 0 means the book is
+            currently unavailable

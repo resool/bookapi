@@ -3,7 +3,9 @@ module PublicApi
     class BooksController < BaseController
       # GET /public-api/v1/books
       def index
-        head :not_implemented
+        editions = Edition.in_circulation.includes(:available_items, work: :authors).order(:id)
+
+        render_paginated(editions, serializer: BookSerializer)
       end
     end
   end
