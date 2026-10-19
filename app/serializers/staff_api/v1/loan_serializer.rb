@@ -12,9 +12,7 @@ module StaffApi
       attribute :returned_at do |object|
         object.returned_at&.iso8601
       end
-      attribute :member_number do |object|
-        object.member.member_number
-      end
+      one :member, resource: MemberSerializer
     end
   end
 end

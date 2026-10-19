@@ -27,12 +27,12 @@ RSpec.describe "Staff API: borrow book", openapi_spec: "staff_api/v1/openapi.yam
             rented_at: "2026-10-01T10:15:00Z",
             due_at: "2026-10-31T10:15:00Z",
             returned_at: nil,
-            member_number: "000042"
+            member: { member_number: "000042", name: "Jan Kowalski", email: "jan.kowalski@example.com" }
           }
         }
 
         run_test! do |response|
-          expect(response.parsed_body.dig("data", "member_number")).to eq(member.member_number)
+          expect(response.parsed_body.dig("data", "member", "member_number")).to eq(member.member_number)
           expect(Time.zone.parse(response.parsed_body.dig("data", "due_at"))).to be_future
           expect(item.reload).to be_loaned
           expect(item.active_loan.member).to eq(member)

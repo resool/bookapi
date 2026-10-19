@@ -2,7 +2,7 @@ class Item < ApplicationRecord
   SKU_FORMAT = /\A\d{6}\z/
 
   belongs_to :edition
-  has_many :loans, dependent: :restrict_with_error
+  has_many :loans, -> { order(rented_at: :desc) }, dependent: :restrict_with_error, inverse_of: :item
   has_one :active_loan, -> { active }, class_name: "Loan"
 
   enum :status, {

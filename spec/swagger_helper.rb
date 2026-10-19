@@ -32,14 +32,24 @@ module OpenapiSchemas
     authors: AUTHORS
   }.freeze
 
+  MEMBER = {
+    type: :object,
+    required: %w[member_number name email],
+    properties: {
+      member_number: { type: :string, pattern: "^\\d{6}$", example: "000042", description: "Library card number" },
+      name: { type: :string, example: "Jan Kowalski" },
+      email: { type: :string, format: :email, example: "jan.kowalski@example.com" }
+    }
+  }.freeze
+
   LOAN = {
     type: :object,
-    required: %w[rented_at due_at returned_at member_number],
+    required: %w[rented_at due_at returned_at member],
     properties: {
       rented_at: { type: :string, format: "date-time", example: "2026-10-01T10:15:00Z" },
       due_at: { type: :string, format: "date-time", example: "2026-10-31T10:15:00Z" },
       returned_at: { type: :string, format: "date-time", nullable: true, example: nil },
-      member_number: { type: :string, pattern: "^\\d{6}$", example: "000042" }
+      member: MEMBER
     }
   }.freeze
 
