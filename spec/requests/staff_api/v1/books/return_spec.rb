@@ -1,6 +1,6 @@
 require "swagger_helper"
 
-RSpec.describe "Staff API: return book", openapi_spec: "staff_api/v1/openapi.yaml", skip: "endpoint not implemented yet" do
+RSpec.describe "Staff API: return book", openapi_spec: "staff_api/v1/openapi.yaml" do
   path "/staff-api/v1/books/{sku}/return" do
     post "Return a borrowed book" do
       tags "Loans"
@@ -11,20 +11,22 @@ RSpec.describe "Staff API: return book", openapi_spec: "staff_api/v1/openapi.yam
       let(:sku) { item.sku }
 
       response "200", "book returned" do
-        schema OpenapiSchemas.data(:loan)
+        schema OpenapiSchemas.data(:book)
         example "application/json", :returned, {
           data: {
-            rented_at: "2026-10-01T10:15:00Z",
-            due_at: "2026-10-31T10:15:00Z",
-            returned_at: "2026-10-12T16:40:00Z",
-            member_number: "000042"
+            sku: "000123",
+            condition: "good",
+            status: "available",
+            title: "Anne of Green Gables",
+            description: "An orphan girl is mistakenly sent to live with an elderly brother and sister on Prince Edward Island.",
+            authors: [ "Lucy Maud Montgomery" ]
           }
         }
 
         let!(:loan) { create(:loan, item:) }
 
         run_test! do |response|
-          expect(response.parsed_body.dig("data", "returned_at")).to be_present
+          expect(response.parsed_body["data"]).to include("sku" => item.sku, "status" => "available")
           expect(loan.reload.returned_at).to be_present
           expect(item.reload).to be_available
         end
