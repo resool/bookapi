@@ -52,6 +52,9 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
+  # Previews live next to the specs: http://localhost:3000/rails/mailers
+  config.action_mailer.preview_paths << Rails.root.join("spec/mailers/previews").to_s
+
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
