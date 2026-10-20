@@ -1,21 +1,20 @@
 Enum item_status {
   available
-  lost
-  withdrawn
   loaned
   in_repair
+  lost
+  withdrawn
 }
 
 Enum member_status {
-  pending
   active
   suspended
-  archived
+  closed
 }
 
 Table authors {
   id bigint [pk]
-  name string [not null]
+  name string [not null, unique]
   description text
   created_at timestamp [not null]
   updated_at timestamp [not null]
@@ -27,12 +26,17 @@ Table works {
   description text
   created_at timestamp [not null]
   updated_at timestamp [not null]
+  indexes {
+    title
+  }
 }
 
 Table authorships {
   id bigint [pk]
   author_id bigint [not null, ref: > authors.id]
   work_id bigint [not null, ref: > works.id]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
   indexes {
     (work_id, author_id) [unique]
     author_id
@@ -45,22 +49,22 @@ Table editions {
   title string [not null]
   description text
   translator string
-  publisher string [not null]
+  publisher string
   published_year integer
-  isbn string [note: 'unique WHERE isbn IS NOT NULL']
+  isbn string
   created_at timestamp [not null]
   updated_at timestamp [not null]
   indexes {
     work_id
-    isbn [unique]
+    isbn [unique, note: 'WHERE isbn IS NOT NULL']
   }
 }
 
 Table items {
   id bigint [pk]
   edition_id bigint [not null, ref: > editions.id]
-  sku string [not null, unique]
-  status item_status [not null, default: "available", note: 'available | in_repair | lost | withdrawn']
+  sku string [not null, unique, note: '6 digits']
+  status item_status [not null, default: "available", note: 'loaned is kept in sync with the active loan']
   condition string [not null]
   acquired_on date
   created_at timestamp [not null]
@@ -72,10 +76,10 @@ Table items {
 
 Table members {
   id bigint [pk]
-  member_number string [not null, unique]
+  member_number string [not null, unique, note: 'library card number, 6 digits']
   name string [not null]
-  email string [not null, unique, note: 'unique on lower(email)']
-  status member_status [not null, default: "pending", note: 'active | suspended | closed']
+  email string [not null, unique, note: 'normalized to lowercase in the model']
+  status member_status [not null, default: "active"]
   created_at timestamp [not null]
   updated_at timestamp [not null]
 }
@@ -84,14 +88,26 @@ Table loans {
   id bigint [pk]
   item_id bigint [not null, ref: > items.id]
   member_id bigint [not null, ref: > members.id]
-  borrowed_at timestamp [not null]
+  rented_at timestamp [not null]
   due_at timestamp [not null]
   returned_at timestamp
+  before_due_date_reminder_sent_at timestamp
+  due_date_reminder_sent_at timestamp
   created_at timestamp [not null]
   updated_at timestamp [not null]
   indexes {
-    item_id [unique, note: 'WHERE returned_at IS NULL']
+    item_id
+    item_id [unique, name: 'index_loans_on_item_id_active', note: 'WHERE returned_at IS NULL – one active loan per copy']
     member_id
-    due_at [note: 'WHERE returned_at IS NULL — przetrzymania']
   }
+}
+
+Table idempotency_keys {
+  id bigint [pk]
+  key string [not null, unique, note: 'Idempotency-Key header']
+  request_fingerprint string [not null, note: 'SHA256 of method, path and body']
+  response_status integer [note: 'NULL while the request is in progress']
+  response_body text
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
 }
