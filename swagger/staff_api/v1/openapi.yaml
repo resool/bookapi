@@ -197,18 +197,27 @@ paths:
                       - Lucy Maud Montgomery
                       status: loaned
                       loans:
-                      - rented_at: '2026-06-02T09:30:00Z'
-                        due_at: '2026-07-02T09:30:00Z'
-                        returned_at: '2026-06-14T17:05:00Z'
-                        member_number: '000017'
-                      - rented_at: '2026-08-11T12:00:00Z'
-                        due_at: '2026-09-10T12:00:00Z'
-                        returned_at: '2026-09-14T10:20:00Z'
-                        member_number: '000042'
                       - rented_at: '2026-10-01T10:15:00Z'
                         due_at: '2026-10-31T10:15:00Z'
                         returned_at:
-                        member_number: '000108'
+                        member:
+                          member_number: '000108'
+                          name: Maria Wiśniewska
+                          email: maria.w@example.com
+                      - rented_at: '2026-08-11T12:00:00Z'
+                        due_at: '2026-09-10T12:00:00Z'
+                        returned_at: '2026-09-14T10:20:00Z'
+                        member:
+                          member_number: '000042'
+                          name: Jan Kowalski
+                          email: jan.kowalski@example.com
+                      - rented_at: '2026-06-02T09:30:00Z'
+                        due_at: '2026-07-02T09:30:00Z'
+                        returned_at: '2026-06-14T17:05:00Z'
+                        member:
+                          member_number: '000017'
+                          name: Anna Nowak
+                          email: anna.nowak@example.com
                 available:
                   value:
                     data:
@@ -221,14 +230,20 @@ paths:
                       - Lucy Maud Montgomery
                       status: available
                       loans:
-                      - rented_at: '2026-06-02T09:30:00Z'
-                        due_at: '2026-07-02T09:30:00Z'
-                        returned_at: '2026-06-14T17:05:00Z'
-                        member_number: '000017'
                       - rented_at: '2026-08-11T12:00:00Z'
                         due_at: '2026-09-10T12:00:00Z'
                         returned_at: '2026-09-14T10:20:00Z'
-                        member_number: '000042'
+                        member:
+                          member_number: '000042'
+                          name: Jan Kowalski
+                          email: jan.kowalski@example.com
+                      - rented_at: '2026-06-02T09:30:00Z'
+                        due_at: '2026-07-02T09:30:00Z'
+                        returned_at: '2026-06-14T17:05:00Z'
+                        member:
+                          member_number: '000017'
+                          name: Anna Nowak
+                          email: anna.nowak@example.com
               schema:
                 type: object
                 required:
@@ -271,7 +286,10 @@ paths:
                       rented_at: '2026-10-01T10:15:00Z'
                       due_at: '2026-10-31T10:15:00Z'
                       returned_at:
-                      member_number: '000042'
+                      member:
+                        member_number: '000042'
+                        name: Jan Kowalski
+                        email: jan.kowalski@example.com
               schema:
                 type: object
                 required:
@@ -539,7 +557,7 @@ components:
       - rented_at
       - due_at
       - returned_at
-      - member_number
+      - member
       properties:
         rented_at:
           type: string
@@ -554,10 +572,25 @@ components:
           format: date-time
           nullable: true
           example:
-        member_number:
-          type: string
-          pattern: "^\\d{6}$"
-          example: '000042'
+        member:
+          type: object
+          required:
+          - member_number
+          - name
+          - email
+          properties:
+            member_number:
+              type: string
+              pattern: "^\\d{6}$"
+              example: '000042'
+              description: Library card number
+            name:
+              type: string
+              example: Jan Kowalski
+            email:
+              type: string
+              format: email
+              example: jan.kowalski@example.com
     book:
       type: object
       required:
