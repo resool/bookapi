@@ -15,7 +15,7 @@ development: &reminders
     schedule: every day at 8am
   due_date_reminders:
     class: Reminders::DueDateJob
-    schedule: every day at 8am
+    schedule: every day at 9am
 
 production:
   <<: *reminders
