@@ -21,7 +21,7 @@ Compose runs three services:
 Tests:
 
 ```bash
-docker compose run --rm -e RAILS_ENV=test web bin/rails db:prepare
+docker compose run --rm -e RAILS_ENV=test web bin/rails db:create db:schema:load
 docker compose run --rm web bundle exec rspec
 ```
 

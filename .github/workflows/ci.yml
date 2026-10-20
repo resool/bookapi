@@ -89,7 +89,7 @@ jobs:
           bundler-cache: true
 
       - name: Prepare database
-        run: bin/rails db:prepare
+        run: bin/rails db:create db:schema:load
 
       - name: Run specs
         run: bundle exec rspec
@@ -116,7 +116,8 @@ jobs:
           bundler-cache: true
 
       - name: Prepare database
-        run: bin/rails db:prepare
+        # Not db:prepare – it seeds a freshly created database, and specs expect an empty one.
+        run: bin/rails db:create db:schema:load
 
       - name: Regenerate OpenAPI docs
         run: bin/rails rswag:specs:swaggerize
