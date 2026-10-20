@@ -7,12 +7,18 @@ module StaffApi
         # POST /staff-api/v1/books/:book_sku/loans
         def create
           item = Item.find_by!(sku: params[:book_sku])
-          member = Member.find_by(member_number: params[:member_number])
-          raise Staff::Errors::MemberNotFound.new(member_number: params[:member_number]) unless member
+          member = Member.find_by(member_number: member_number)
+          raise Staff::Errors::MemberNotFound.new(member_number: member_number) unless member
 
           loan = Staff::Loans::Create.new(item:, member:).call
 
           render_data(V1::LoanSerializer.new(loan).serializable_hash, status: :created)
+        end
+
+        private
+
+        def member_number
+          @member_number ||= params[:member_number]
         end
       end
     end

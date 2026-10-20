@@ -9,20 +9,28 @@ module Idempotency
   private
 
   def idempotent
-    key = request.headers[HEADER]
-    return yield if key.blank?
+    return yield if idempotent_key.blank?
 
-    record = IdempotencyKey.create_or_find_by!(key:) do |new_record|
-      new_record.request_fingerprint = request_fingerprint
-    end
-
-    if record.previously_new_record?
-      perform_and_store(record) { yield }
+    if idempotent_record.previously_new_record?
+      perform_and_store(idempotent_record) { yield }
     else
-      replay(record)
+      replay(idempotent_record)
     end
   end
 
+  def idempotent_record
+    @idempotent_record ||= IdempotencyKey.create_or_find_by!(key: idempotent_key) do |new_record|
+      new_record.request_fingerprint = request_fingerprint
+    end
+  end
+
+  def idempotent_key
+    return @idempotent_key if instance_variable_defined?(:@idempotent_key)
+
+    @idempotent_key = request.headers[HEADER].presence
+  end
+
+  # :reek:DuplicateMethodCall
   def perform_and_store(record)
     yield
 

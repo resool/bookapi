@@ -3,6 +3,7 @@ module Reminders
   class BeforeDueDateChecker < BaseChecker
     private
 
+    # :reek:UtilityFunction
     def settings
       Settings.reminders.before_due_date
     end

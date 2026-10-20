@@ -9,6 +9,7 @@ class IdempotencyKey < ApplicationRecord
     Digest::SHA256.hexdigest([ method, path, body ].join("\n"))
   end
 
+  # :reek:NilCheck
   def in_progress?
     response_status.nil?
   end

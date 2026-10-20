@@ -17,6 +17,7 @@ module Staff
 
       attr_reader :item, :member, :now
 
+      # :reek:DuplicateMethodCall
       def validate_member!
         raise Errors::MemberSuspended.new(member_number: member.member_number) if member.suspended?
         raise Errors::MemberClosed.new(member_number: member.member_number) if member.closed?

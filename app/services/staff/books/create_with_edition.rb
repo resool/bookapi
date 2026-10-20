@@ -1,6 +1,7 @@
 module Staff
   module Books
     class CreateWithEdition
+      # :reek:LongParameterList
       def initialize(title:, authors:, condition:, description:, publisher:, published_year:, isbn:, translator:)
         @title = title
         @author_names = Array(authors).map { |name| name.to_s.squish }.compact_blank.uniq

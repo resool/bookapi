@@ -3,10 +3,12 @@ module Reminders
   class DueDateChecker < BaseChecker
     private
 
+    # :reek:UtilityFunction
     def settings
       Settings.reminders.due_date
     end
 
+    # :reek:UtilityFunction
     def due_day
       Date.current
     end

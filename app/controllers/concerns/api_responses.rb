@@ -17,6 +17,7 @@ module ApiResponses
     }
   end
 
+  # :reek:UtilityFunction
   def pagination_meta(pagy)
     { page: pagy.page, limit: pagy.limit, count: pagy.count, pages: pagy.last }
   end

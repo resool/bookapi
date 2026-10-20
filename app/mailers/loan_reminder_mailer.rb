@@ -1,3 +1,4 @@
+# :reek:InstanceVariableAssumption
 class LoanReminderMailer < ApplicationMailer
   before_action :assign_loan
 
