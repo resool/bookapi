@@ -39,7 +39,7 @@ gem "image_processing", "~> 1.2"
 # gem "rack-cors"
 
 # Alba is a JSON serializer for Ruby, JRuby, and TruffleRuby.
-gem "alba", "~> 4.0.0"
+gem "alba", "~> 4.0.1"
 # Agile pagination
 gem "pagy", "~> 43.8"
 
