@@ -55,7 +55,7 @@ group :development, :test do
   gem "bullet"
 
   # Pry is a runtime developer console and IRB alternative with powerful introspection capabilities.
-  gem "pry", "~> 0.16.0"
+  gem "pry", "~> 0.16.1"
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem "bundler-audit", require: false
